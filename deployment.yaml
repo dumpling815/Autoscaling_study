@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autoscaling-deployment
+  labels:
+    app: vanilla_ubuntu
+spec:
+  selector:
+    matchLabels:
+      app: vanilla_ubuntu
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: vanilla_ubuntu
+    spec:
+      containers:
+        - name: basic-container
+          image: minuk0815/autoscaling:latest
+          command: ["bash", "-c", "while true; do sleep 30; done"]
+          imagePullPolicy: Always
+      imagePullSecrets:
+        - name: minuk-dockerhub-secret
