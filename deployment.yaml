@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: autoscaling-deployment
+  namespace: target
   labels:
     app: vanilla_ubuntu
 spec:
@@ -10,14 +11,27 @@ spec:
       app: vanilla_ubuntu
   replicas: 4
   template:
+    spec:
+      terminationGracePeriodSeconds: 30
     metadata:
       labels:
         app: vanilla_ubuntu
     spec:
+      volumnes: # For saving Container's current status (If rollout update needed)
+        - name: basic-container-data
+          persistentVolumeClaim:
+            claimName: app-pvc
       containers:
         - name: basic-container
           image: minuk0815/autoscaling:latest
           command: ["bash", "-c", "while true; do sleep 30; done"]
           imagePullPolicy: Always
+          volumeMounts: # File system path of Pod
+            - mountPath: "/data"
+              name: basic-conatiner-data
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "save_state && sync"]
       imagePullSecrets:
         - name: minuk-dockerhub-secret
