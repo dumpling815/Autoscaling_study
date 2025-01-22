@@ -1,0 +1,7 @@
+"100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100 )"
+
+Objective : Get CPU Utilization per Container & estimate the CPU performance by comparing Utilization
+
+sum(rate(pod_cpu_usage_seconds_total{namespace="target"}[30])) by (pod)
+/
+sum(kube_pod_)
